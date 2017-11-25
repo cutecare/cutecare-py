@@ -1,8 +1,8 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 setup(name='cutecare-py',
-      version='0.1',
-      description='Library to read data from CuteCare Bluetooth LE sensor',
+      version='0.4',
+      description='Library to read data from CuteCare Bluetooth LE DIY sensor',
       url='https://github.com/cutecare/cutecare-py',
       author='Evgeny Savitsky',
       author_email='evgeny.savitsky@gmail.com',
@@ -16,7 +16,7 @@ setup(name='cutecare-py',
           'Programming Language :: Python :: 3.4',
           'Programming Language :: Python :: 3.5'
       ],
-      packages=find_packages(),
+      packages=['cutecare','cutecare.backends'],
       keywords='home assistant sensor bluetooth low-energy ble',
       zip_safe=False,
       extras_require={'testing': ['pyest']}
