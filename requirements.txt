@@ -1,0 +1,3 @@
+bluepy
+pytest
+pytest-cov
