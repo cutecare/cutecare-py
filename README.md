@@ -1,7 +1,10 @@
-# miflora - Library for Xiaomi Mi plant sensor
-
-This library lets you read sensor data from a Xiaomi Mi Flora plant sensor.
-
+## Setup development environment
+### Linux (Ubuntu)
+sudo apt-get install python3-pip python3-dev python3-venv python3-setuptools
+sudo apt-get install libboost-all-dev libssl-dev libxml2-dev libxslt1-dev libjpeg-dev libffi-dev libudev-dev zlib1g-dev libpython-dev libudev-dev
+sudo apt-get install libglib2.0-dev libboost-python-dev luetooth libbluetooth-dev net-tools rfkill nmap iputils-ping
+sudo ln -s /usr/lib/x86_64-linux-gnu/libboost_python-py35.so /usr/lib/x86_64-linux-gnu/libboost_python-py34.so
+sudo pip3 install gattlib
 
 ## Functionality 
 It supports reading the different measurements from the sensor
