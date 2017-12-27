@@ -37,6 +37,10 @@ class MockBackend(AbstractBackend):
         """Read one of the handles that are implemented."""
         return self._read_sensor_data()
 
+    def read_handle_listen(self, handle):
+        """Read one of the handles that are implemented."""
+        return self._read_sensor_data()
+
     def write_handle(self, handle, value):
         """Writing handles just stores the results in a list."""
         self.written_handles.append((handle, value))
@@ -46,8 +50,8 @@ class MockBackend(AbstractBackend):
         """Recreate sensor data from the fields of this class."""
         result = [0xFE]*2
         temp = int(self.value)
-        result[0] = int(temp % 256)
-        result[1] = int(temp / 256)
+        result[1] = int(temp % 256)
+        result[0] = int(temp / 256)
         return bytes(result)
 
     def _read_name(self):

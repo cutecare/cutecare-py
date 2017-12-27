@@ -1,6 +1,6 @@
 import unittest
 import pytest
-from cutecare.poller import CuteCarePoller
+from cutecare.poller import CuteCarePollerCC41A as CuteCarePoller
 from cutecare.backends.gatttool import GatttoolBackend
 from cutecare.backends.bluepy import BluepyBackend
 

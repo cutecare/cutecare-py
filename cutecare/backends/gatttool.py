@@ -17,7 +17,7 @@ _LOGGER = logging.getLogger(__name__)
 
 class GatttoolBackend(AbstractBackend):
 
-    def __init__(self, adapter='hci0', retries=3, timeout=20):
+    def __init__(self, adapter='hci0', retries=3, timeout=5):
         super(GatttoolBackend, self).__init__(adapter)
         self.adapter = adapter
         self.retries = retries
@@ -97,7 +97,6 @@ class GatttoolBackend(AbstractBackend):
 
         @param: mac - MAC address in format XX:XX:XX:XX:XX:XX
         @param: handle - BLE characteristics handle in format 0xXX
-        @param: timeout - timeout in seconds
         """
 
         if not self.is_connected():
@@ -128,14 +127,10 @@ class GatttoolBackend(AbstractBackend):
 
             result = result.decode("utf-8").strip(' \n\t')
             _LOGGER.debug("Got \"%s\" from gatttool", result)
-            # Parse the output
-            if "read failed" in result:
-                raise ValueError("Read error from gatttool: %s", result)
 
             res = re.search("( [0-9a-fA-F][0-9a-fA-F])+", result)
             if res:
-                _LOGGER.debug(
-                    "Exit read_ble with result (%s)", current_thread())
+                _LOGGER.debug("Exit read_ble with result (%s)", current_thread())
                 return [int(x, 16) for x in res.group(0).split()]
 
             attempt += 1
@@ -146,6 +141,63 @@ class GatttoolBackend(AbstractBackend):
 
         _LOGGER.debug("Exit read_ble, no data (%s)", current_thread())
         return None
+
+    def read_handle_listen(self, handle):
+        """
+        Read from a BLE address and listen for notifications
+
+        @param: mac - MAC address in format XX:XX:XX:XX:XX:XX
+        @param: handle - BLE characteristics handle in format 0xXX
+        """
+
+        if not self.is_connected():
+            raise ValueError('Not connected to any device.')
+
+        attempt = 0
+        delay = 10
+        _LOGGER.debug("Enter read_listen_ble (%s)", current_thread())
+
+        while attempt <= self.retries:
+            cmd = "gatttool --device={} --char-read -a {} --adapter={} --listen".format(
+                self._mac, self.byte_to_handle(handle), self.adapter)
+            _LOGGER.debug("Running gatttool with a timeout of %d: %s", self.timeout, cmd)
+            with Popen(cmd,
+                       shell=True,
+                       stdout=PIPE,
+                       stderr=PIPE,
+                       preexec_fn=os.setsid if hasattr(os, 'setsid') else None) as process:
+                try:
+                    result = process.communicate(timeout=self.timeout)[0]
+                    _LOGGER.debug("Finished gatttool")
+                except TimeoutExpired:
+                    # send signal to the process group
+                    os.killpg(process.pid, signal.SIGINT)
+                    result = process.communicate()[0]
+                    _LOGGER.debug("Killed hanging gatttool")
+
+            result = result.decode("utf-8").strip(' \n\t')
+            _LOGGER.debug("Got \"%s\" from gatttool", result)
+
+            # Parse the output
+            bytes = self.parseBytes(result)
+            if len(bytes) > 1: 
+                return bytes
+
+            attempt += 1
+            _LOGGER.debug("Waiting for %s seconds before retrying", delay)
+            if attempt < self.retries:
+                time.sleep(delay)
+                delay *= 2
+
+        _LOGGER.debug("Exit read_ble, no data (%s)", current_thread())
+        return None
+
+    def parseBytes(self, text):
+        res = re.findall("(( [0-9a-fA-F][0-9a-fA-F]){4,})+", text)
+        if res:
+            return [int(x, 16) for x in res.pop()[0].split()]
+        else:
+            return []
 
     def check_backend(self):
         try:

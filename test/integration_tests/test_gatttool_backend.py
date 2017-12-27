@@ -36,3 +36,12 @@ class TestGatttoolBackend(unittest.TestCase):
 
     def test_check_backend(self):
         self.backend.check_backend()
+
+    def test_parse_bytes(self):
+        result = """
+        value: 01 02 03 04
+        value: 05 06 07 08 
+        value: 09
+        """
+        bytes = self.backend.parseBytes(result)
+        self.assertEqual(bytes[0], 5)

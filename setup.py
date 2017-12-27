@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='cutecare-py',
-      version='0.4',
+      version='0.12',
       description='Library to read data from CuteCare Bluetooth LE DIY sensor',
       url='https://github.com/cutecare/cutecare-py',
       author='Evgeny Savitsky',

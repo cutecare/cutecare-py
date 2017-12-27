@@ -1,4 +1,4 @@
-from cutecare.poller import CuteCarePoller
+from cutecare.poller import CuteCarePollerCC41A as CuteCarePoller
 
 import unittest
 from test.unit_tests import MockBackend
@@ -44,13 +44,6 @@ class TestCuteCarePoller(unittest.TestCase):
 
         backend.override_read_handles[HANDLE_READ_SENSOR_DATA] = INVALID_DATA
         self.assertRaises(OSError, poller.parameter_value)
-
-    def test_name(self):
-        """Check reading of the sensor name."""
-        poller = CuteCarePoller(self.TEST_MAC, MockBackend)
-        backend = self._get_backend(poller)
-        backend.name = 'CuteCare DIY sensor'
-        self.assertEqual(backend.name, poller.name())
 
     @staticmethod
     def _get_backend(poller):
